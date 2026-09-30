@@ -1,0 +1,9 @@
+{
+  "name": "WAY TO SHINE",
+  "short_name": "WAY TO SHINE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060811",
+  "theme_color": "#070911",
+  "description": "WAY TO SHINE — EDN48 & TLP48 Official Application"
+}
