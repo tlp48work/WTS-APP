@@ -1,0 +1,1 @@
+WAY TO SHINE V2 — animated banners, generation member pages, Token audio unlock demo, Spark/Major vote demo, login/register and My Account. Authentication and balances are localStorage demo only; real public accounts need a secure backend.
