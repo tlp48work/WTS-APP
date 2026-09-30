@@ -22,7 +22,20 @@ button{color:inherit}.welcome{min-height:100vh;display:flex;align-items:center;j
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app">
+  <main class="welcome"><div class="welcome-box">
+    <div class="mark">W</div>
+    <div class="ey">APPLICATION</div>
+    <h1>WAY TO <span class="purple">SHINE</span></h1>
+    <p class="sub">Your stage. Your star. Your way to shine.</p>
+    <div class="carousel">
+      <button class="pick" onclick="setGroup('TLP48')"><b>TLP48</b><span>TULIP ZONE</span></button>
+      <button class="pick main" onclick="setGroup('EDN48')"><b>EDN48</b><span>EDEN CLUB</span></button>
+    </div>
+    <button class="artist" onclick="toast('WAY TO SHINE ARTIST กำลังเตรียมข้อมูล')">WAY TO SHINE ARTIST →</button>
+    <div class="hint">แตะการ์ดเพื่อเข้าใช้งาน</div>
+  </div></main>
+</div>
 <script>
 const data={
  EDN48:{club:"EDEN CLUB",color:"purple",members:[
@@ -32,10 +45,16 @@ const data={
   ["Luna","Luna Example",20,"@tlp48_luna"],["Mew","Mew Example",19,"@tlp48_mew"],["Pearl","Pearl Example",21,"@tlp48_pearl"],["Nana","Nana Example",18,"@tlp48_nana"]],
  events:[["05 OCT","TLP48 THE 1ST STAGE","TULIP ZONE"],["12 OCT","TULIP MEET & GREET","BANGKOK"],["24 OCT","TLP48 SPECIAL LIVE","TULIP HALL"]]}
 };
-let group=localStorage.wtsGroup||"EDN48", screen="welcome";
-let state=JSON.parse(localStorage.wtsState||'{"star":80,"token":1200,"oshi":[],"kami":"","logged":false,"email":""}');
+let group="EDN48", screen="welcome";
+let state={"star":80,"token":1200,"oshi":[],"kami":"","logged":false,"email":""};
+try {
+  group=localStorage.wtsGroup||"EDN48";
+  state=JSON.parse(localStorage.wtsState||JSON.stringify(state));
+} catch(e) {}
 const $=id=>document.getElementById(id);
-function save(){localStorage.wtsState=JSON.stringify(state);localStorage.wtsGroup=group}
+function save(){
+  try { localStorage.wtsState=JSON.stringify(state); localStorage.wtsGroup=group; } catch(e) {}
+}
 function toast(x){let d=document.createElement("div");d.className="toast";d.textContent=x;document.body.appendChild(d);setTimeout(()=>d.remove(),2000)}
 function setGroup(g){group=g;save();render("home")}
 function render(s){screen=s;let d=data[group];document.body.className=group==="TLP48"?"tlp":"";$("app").innerHTML=screen==="welcome"?welcome():layout(s,d)}
@@ -54,7 +73,12 @@ function kami(n){state.kami=n;save();toast(n+' เป็น Kami Oshi แล้�
 function voteOne(){if(state.star<10)return toast('STAR ไม่พอ');state.star-=10;save();toast('โหวตสำเร็จ ใช้ 10 STAR')}
 function login(){let email=prompt('Email / Username');if(email){state.email=email;state.logged=true;save();render('account');toast('เข้าสู่ระบบสำเร็จ')}}
 function logout(){state.logged=false;state.email='';save();render('account');toast('ออกจากระบบแล้ว')}
-render('welcome');
+window.addEventListener('error', function(e){
+  console.error(e.error || e.message);
+});
+try { render('welcome'); } catch(e) {
+  console.error(e);
+}
 </script>
 </body>
 </html>
