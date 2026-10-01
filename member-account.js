@@ -1,0 +1,27 @@
+(function(){
+const ACC='wts_member_accounts_v1', POSTS='wts_timeline_v1';
+const root=document.getElementById('memberOnly');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function get(k,d){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}}
+function current(){const u=localStorage.getItem('wts_member_session'); if(!u)return null; return get(ACC,[]).find(x=>x.username===u)||null}
+function initials(n){return String(n||'M').trim().slice(0,1).toUpperCase()}
+function fmt(d){return new Intl.DateTimeFormat('th-TH',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(d))}
+function posts(me){return get(POSTS,[]).filter(p=>p.username===me.username).sort((a,b)=>b.createdAt-a.createdAt)}
+function render(){const me=current(); if(!me){root.innerHTML=`<section class="member-account-locked"><div class="locked-icon">✦</div><h1>MEMBER ACCOUNT</h1><p>หน้านี้สำหรับบัญชีสมาชิก EDN48 / TLP48 เท่านั้น</p><a class="primary account-login-btn" href="member-login.html?return=account.html">MEMBER LOGIN</a><a class="soft-link" href="index.html">กลับหน้า HOME</a></section>`;return}
+const ps=posts(me), stars=Number(me.stars||0), likes=Number(me.likes||0),oshi=Number(me.oshi||0),kami=me.kami||'—';
+root.innerHTML=`<section class="member-profile-head ${me.group==='TLP48'?'tlp-profile':'edn-profile'}">
+<div class="member-cover" style="${me.cover?'background-image:url('+encodeURI(me.cover)+')':''}"><div class="cover-shine"></div></div>
+<div class="member-profile-main"><div class="member-profile-avatar" style="${me.photo?'background-image:url('+encodeURI(me.photo)+')':''}">${me.photo?'':esc(initials(me.name))}</div><div class="kami-pill">+ Kami-Oshi</div><h1>${esc(me.name)}</h1><p class="member-symbol">${esc(me.symbol||'✦')}</p><span class="group-pill">${esc(me.group)} · MEMBER ACCOUNT</span></div>
+<div class="member-stats"><div><b>${oshi.toLocaleString()}</b><span>Oshi</span></div><div><b>${stars.toLocaleString()}</b><span>STAR</span></div><div><b>${likes.toLocaleString()}</b><span>Like</span></div><div><b>${ps.length}</b><span>Posts</span></div></div>
+<div class="member-actions"><button class="member-star-btn" id="sendSelfStar">⭐ STAR</button></div></section>
+<section class="member-account-tools section"><div class="account-welcome"><div><span>WELCOME BACK</span><b>${esc(me.name)}</b><small>โพสต์ใน Timeline และจัดการบัญชีของคุณ</small></div><span class="account-dot">●</span></div>
+<form class="timeline-composer member-composer" id="memberPostForm"><div class="timeline-compose-top"><div class="timeline-avatar" style="${me.photo?'background-image:url('+encodeURI(me.photo)+')':''}">${me.photo?'':esc(initials(me.name))}</div><textarea id="postText" maxlength="1000" placeholder="${esc(me.name)} กำลังคิดอะไรอยู่?" required></textarea></div><div class="timeline-compose-tools"><input id="postMedia" type="url" placeholder="ลิงก์รูป/วิดีโอ (ถ้ามี)"><button class="timeline-post-btn">POST</button></div></form>
+<div class="member-mini-info"><span>Oshi <b>${oshi}</b></span><span>Kami-Oshi <b>${esc(kami)}</b></span><span>STAR <b>${stars}</b></span><span>Token <b>${Number(me.token||10)}</b></span></div></section>
+<section class="section member-own-timeline"><div class="timeline-head"><div><span class="timeline-kicker">${esc(me.group)} • ${esc(me.name)}</span><h2>Timeline</h2></div><span class="timeline-count">${ps.length} posts</span></div><div id="ownPosts" class="timeline-list">${ps.length?ps.map(postCard).join(''):`<div class="timeline-empty"><div>✦</div><b>ยังไม่มีโพสต์</b><span>โพสต์แรกของคุณจะแสดงตรงนี้</span></div>`}</div></section>`;
+const f=document.getElementById('memberPostForm');f.onsubmit=e=>{e.preventDefault();const text=document.getElementById('postText').value.trim();if(!text)return;const arr=get(POSTS,[]);arr.push({id:'post-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),username:me.username,name:me.name,group:me.group,photo:me.photo||'',text,media:document.getElementById('postMedia').value.trim(),createdAt:Date.now(),stars:0,comments:0});localStorage.setItem(POSTS,JSON.stringify(arr));render()};
+document.getElementById('sendSelfStar').onclick=()=>alert('STAR ใช้สำหรับส่งให้สมาชิกจากหน้าโปรไฟล์สาธารณะ');
+document.getElementById('logoutTop').onclick=()=>{localStorage.removeItem('wts_member_session');location.href='member-login.html'};
+}
+function postCard(p){return `<article class="timeline-post"><div class="timeline-post-head"><a class="timeline-avatar" href="member.html?username=${encodeURIComponent(p.username)}" style="${p.photo?'background-image:url('+encodeURI(p.photo)+')':''}">${p.photo?'':esc(initials(p.name))}</a><div class="timeline-author"><a href="member.html?username=${encodeURIComponent(p.username)}"><b>${esc(p.name)}</b></a><small>${esc(p.group)} · ${fmt(p.createdAt)}</small></div></div>${p.text?`<div class="timeline-text">${esc(p.text).replace(/\n/g,'<br>')}</div>`:''}${p.media?`<img class="timeline-media" src="${esc(p.media)}" alt="Post media" loading="lazy" onerror="this.style.display='none'">`:''}<div class="timeline-actions"><span>⭐ <b>${Number(p.stars||0).toLocaleString()}</b> STAR</span><span>♡ <b>${Number(p.comments||0)}</b> Comments</span></div></article>`}
+render();
+})();
