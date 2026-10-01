@@ -1,54 +1,8 @@
-<!doctype html>
-<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WAY TO SHINE • ADMIN</title><link rel="stylesheet" href="style.css">
-<style>
-.wts-admin{max-width:760px;margin:auto;padding:22px 18px 80px}.wts-box{background:#fff;border:1px solid #eee;border-radius:24px;padding:20px;margin:14px 0;box-shadow:0 10px 30px #00000009}
-.wts-box h2{margin-top:0}.wts-box input,.wts-box select,.wts-box textarea{width:100%;padding:13px;margin:5px 0 10px;border:1px solid #ddd;border-radius:13px;font:inherit}.wts-box button{padding:11px 15px;border:0;border-radius:12px;font-weight:800}.wts-primary{background:#8c68d9;color:#fff}.wts-row{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px dashed #eee;padding:12px 0}.wts-count{font-size:13px;color:#777}
-</style></head><body>
-<header class="top"><a class="back" href="index.html">‹</a><b>ADMIN PANEL</b><a class="icon" href="index.html">⌂</a></header>
-<main class="wts-admin">
-<div class="wts-box"><h1>WAY TO SHINE ADMIN</h1><p>หลังบ้านสำหรับเพิ่ม/แก้ข้อมูลสมาชิก</p><div class="wts-count">โครงจำนวนสมาชิกเริ่มต้น: TLP48 2 / 4 / 2 / 7 • EDN48 5 / 11 / 13</div></div>
-<div class="wts-box"><h2>เพิ่มโปรไฟล์สมาชิก</h2>
-<label>Group</label><select id="wts-group"><option>TLP48</option><option>EDN48</option></select>
-<label>Generation</label><select id="wts-gen"><option value="1">1st Generation</option><option value="2">2nd Generation</option><option value="3">3rd Generation</option><option value="4">4th Generation</option></select>
-<label>ชื่อสมาชิก</label><input id="wts-name" data-wts-input placeholder="Member Name">
-<label>ชื่อจริง</label><input id="wts-real" data-wts-input placeholder="Real Name">
-<label>อายุ</label><input id="wts-age" data-wts-input placeholder="Age">
-<label>Instagram</label><input id="wts-ig" data-wts-input placeholder="@instagram">
-<label>ข้อมูลเพิ่มเติม</label><textarea id="wts-info" data-wts-input placeholder="Profile information"></textarea>
-<label>รูปโปรไฟล์</label><input id="wts-image" data-wts-input placeholder="ใส่ชื่อไฟล์/ลิงก์รูป">
-<button class="wts-primary" onclick="wtsAddMember()">+ เพิ่มโปรไฟล์</button>
-</div>
-<div class="wts-box"><h2>สมาชิกที่เพิ่มจากหลังบ้าน</h2><div id="wts-admin-members">กำลังโหลด...</div></div>
-<div class="wts-box"><h2>โครงจำนวนสมาชิก</h2>
-<div class="wts-row"><b>TLP48 GEN 1</b><span>2 คน</span></div><div class="wts-row"><b>TLP48 GEN 2</b><span>4 คน</span></div>
-<div class="wts-row"><b>TLP48 GEN 3</b><span>2 คน</span></div><div class="wts-row"><b>TLP48 GEN 4</b><span>7 คน</span></div>
-<div class="wts-row"><b>EDN48 GEN 1</b><span>5 คน</span></div><div class="wts-row"><b>EDN48 GEN 2</b><span>11 คน</span></div><div class="wts-row"><b>EDN48 GEN 3</b><span>13 คน</span></div>
-</div>
-</main>
-
-<script>
-const WTS_DEFAULTS={
- TLP48:[2,4,2,7],
- EDN48:[5,11,13]
-};
-function wtsMembers(){
- try{return JSON.parse(localStorage.getItem('wts_members')||'[]')}catch(e){return[]}
-}
-function wtsSaveMembers(a){localStorage.setItem('wts_members',JSON.stringify(a))}
-function wtsRenderAdmin(){
- const el=document.getElementById('wts-admin-members'); if(!el)return;
- const a=wtsMembers();
- el.innerHTML=a.length?a.map((m,i)=>`<div class="wts-admin-row"><b>${m.group} GEN ${m.gen}</b> — ${m.name||'Member '+(i+1)} <button onclick="wtsDeleteMember(${i})">ลบ</button></div>`).join(''):'ยังไม่มีโปรไฟล์ที่เพิ่มจากหลังบ้าน';
-}
-function wtsAddMember(){
- const group=document.getElementById('wts-group').value,gen=+document.getElementById('wts-gen').value;
- const name=document.getElementById('wts-name').value.trim(),real=document.getElementById('wts-real').value.trim();
- if(!name)return alert('กรุณาใส่ชื่อสมาชิก');
- const a=wtsMembers();a.push({group,gen,name,real,age:document.getElementById('wts-age').value,ig:document.getElementById('wts-ig').value,info:document.getElementById('wts-info').value,image:document.getElementById('wts-image').value});
- wtsSaveMembers(a);wtsRenderAdmin();document.querySelectorAll('[data-wts-input]').forEach(x=>x.value='');alert('เพิ่มโปรไฟล์แล้ว');
-}
-function wtsDeleteMember(i){const a=wtsMembers();a.splice(i,1);wtsSaveMembers(a);wtsRenderAdmin()}
-document.addEventListener('DOMContentLoaded',wtsRenderAdmin);
-</script>
-</body></html>
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADMIN</title><link rel="stylesheet" href="style.css"></head><body><header class="top"><a href="index.html">‹</a><b>ADMIN PANEL</b><a href="index.html">⌂</a></header><main class="admin"><div class="profile-hero"><div class="avatar">⚙</div><h1>WAY TO SHINE ADMIN</h1><p>จัดการสมาชิก / ข้อมูล / Banner</p></div><div id="login" class="box"><h2>ADMIN LOGIN</h2><input class="input" id="pin" placeholder="Admin Code" type="password"><button onclick="adminLogin()">LOGIN</button><p class="notice">Demo admin code: WTS-ADMIN-2026</p></div><div id="panel" style="display:none"><div class="box"><h2>เพิ่มสมาชิก</h2><label>Group</label><select class="input" id="group"><option>TLP48</option><option>EDN48</option></select><label>Generation</label><select class="input" id="gen"><option>1</option><option>2</option><option>3</option><option>4</option></select><label>ชื่อ</label><input class="input" id="name"><label>ชื่อจริง</label><input class="input" id="real"><label>อายุ</label><input class="input" id="age"><label>Instagram</label><input class="input" id="ig"><label>ข้อมูล</label><textarea class="input" id="info"></textarea><button onclick="add()">+ ADD MEMBER</button></div><div class="box admin-list"><h2>โปรไฟล์ที่ Admin เพิ่ม</h2><div id="list"></div></div><div class="box"><h2>จำนวนเริ่มต้น</h2><p>TLP48: Gen1 2 • Gen2 4 • Gen3 2 • Gen4 7</p><p>EDN48: Gen1 5 • Gen2 11 • Gen3 13</p></div></div></main><script>
+const key='wts_admin_members';
+function adminLogin(){if(pin.value==='WTS-ADMIN-2026'){login.style.display='none';panel.style.display='block';render()}else alert('Admin Code ไม่ถูกต้อง')}
+function arr(){return JSON.parse(localStorage.getItem(key)||'[]')}
+function add(){let a=arr();a.push({group:group.value,gen:gen.value,name:name.value,real:real.value,age:age.value,ig:ig.value,info:info.value});localStorage.setItem(key,JSON.stringify(a));render();alert('เพิ่มโปรไฟล์แล้ว')}
+function del(i){let a=arr();a.splice(i,1);localStorage.setItem(key,JSON.stringify(a));render()}
+function render(){list.innerHTML=arr().map((m,i)=>'<div class="list-row"><span class="list-icon">👤</span><span><b>'+m.group+' GEN '+m.gen+'</b><br>'+m.name+'<br><small>'+m.real+' • '+m.age+' • '+m.ig+'</small></span><button onclick="del('+i+')">ลบ</button></div>').join('')||'<p style="color:#888">ยังไม่มีข้อมูลที่เพิ่ม</p>'}
+</script></body></html>

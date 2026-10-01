@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.hero-slider').forEach(sl=>{let s=[...sl.querySelectorAll('.slide')],d=[...sl.querySelectorAll('.dots i')],i=0;if(!s.length)return;setInterval(()=>{s[i].classList.remove('active');d[i]?.classList.remove('active');i=(i+1)%s.length;s[i].classList.add('active');d[i]?.classList.add('active')},5000)})});
