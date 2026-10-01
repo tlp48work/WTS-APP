@@ -1,8 +1,10 @@
 {
-  "name": "way-to-shine-production",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
   "engines": {"node": ">=20"},
-  "dependencies": {"@supabase/supabase-js": "^2.57.4"}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "bcryptjs": "^3.0.2",
+    "jose": "^6.1.0",
+    "busboy": "^1.0.0"
+  }
 }
