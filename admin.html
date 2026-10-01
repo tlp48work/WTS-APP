@@ -1,1 +1,54 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin • WAY TO SHINE</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="app"><header class="top"><a href="index.html">‹</a><div class="brand">ADMIN PANEL</div><div class="icons">⚙</div></header><section class="auth-wrap" id="gate"><div class="auth-card"><h1>Admin Access</h1><p style="color:#888">ใส่รหัสแอดมินเพื่อเข้าเครื่องมือจัดการ</p><div class="field"><label>ADMIN CODE</label><input id="code" type="password" placeholder="Admin code"></div><button class="primary fullbtn" onclick="enter()">ENTER ADMIN</button><div class="admin-note">DEMO CODE: <b>WTS-ADMIN-2026</b><br>เวอร์ชันนี้เป็น Static Demo: ข้อมูลที่เพิ่มจากหน้านี้จะอยู่ในเบราว์เซอร์เครื่องนั้น</div></div></section><section id="panel" style="display:none"><div class="admin-note" style="margin:16px 18px">เพิ่มสมาชิก + รูป + รุ่น + Kami-Oshi ได้จากมือถือ และสามารถลบสมาชิกได้ทันที</div><div class="admin-tabs"><button class="active" onclick="tab('members',this)">Members</button><button onclick="tab('banner',this)">Banner / BG</button><button onclick="tab('music',this)">Music</button></div><section class="section" id="membersTab"><h2 class="section-title">ADD MEMBER</h2><div class="card"><div class="field"><label>GROUP</label><select id="mgroup"><option value="tlp">TLP48</option><option value="edn">EDN48</option></select></div><div class="field"><label>GENERATION</label><input id="mgen" value="Generation 1"></div><div class="field"><label>NAME</label><input id="mname" placeholder="Member name"></div><div class="field"><label>REAL NAME</label><input id="mreal" placeholder="Real name"></div><div class="field"><label>AGE</label><input id="mage" placeholder="—"></div><div class="field"><label>KAMI-OSHI TITLE</label><input id="mkami" placeholder="เช่น Kami-Oshi / Oshi"></div><div class="field"><label>INFO</label><textarea id="mbio" rows="3" placeholder="Member information"></textarea></div><div class="field"><label>PHOTO</label><input id="mphoto" type="file" accept="image/*"></div><button class="primary fullbtn" onclick="addMember()">+ ADD MEMBER</button></div><h2 class="section-title">CURRENT MEMBERS</h2><div id="adminMembers"></div></section><section class="section" id="bannerTab" style="display:none"><div class="card"><h2>Banner / Background</h2><p>หน้าเดิมยังคงใช้ Animated Banner อัตโนมัติและเอฟเฟกต์แสงวิ่ง</p><div class="field"><label>BACKGROUND COLOR</label><input id="bgColor" type="color" value="#f8f8fb"></div><div class="field"><label>BACKGROUND IMAGE</label><input id="bgFile" type="file" accept="image/*"></div><button class="primary fullbtn" onclick="saveBg()">SAVE BACKGROUND</button><button class="primary fullbtn" style="background:#eee;color:#333" onclick="resetBg()">RESET BACKGROUND</button><p style="color:#888;font-size:12px">เวอร์ชัน Static นี้บันทึกพื้นหลังในเบราว์เซอร์เครื่องนี้เท่านั้น</p></div></section><section class="section" id="musicTab" style="display:none"><div class="card"><h2>Music Audio</h2><p>เพลงแยกใบ • ตั้งค่า TOKEN • ปลดล็อกแยกเพลง</p><p style="color:#888">แก้รายการเพลงถาวรได้ในไฟล์ app.js หรือเชื่อมฐานข้อมูลในขั้นต่อไป</p></div></section></section></main><script>function enter(){if(document.getElementById('code').value==='WTS-ADMIN-2026'){sessionStorage.setItem('wts_admin','1');document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block';renderAdmin()}else alert('รหัสแอดมินไม่ถูกต้อง')}if(sessionStorage.getItem('wts_admin')==='1'){document.getElementById('gate').style.display='none';document.getElementById('panel').style.display='block'}function tab(id,btn){['members','banner','music'].forEach(x=>document.getElementById(x+'Tab').style.display=x===id?'block':'none');document.querySelectorAll('.admin-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}function renderAdmin(){const d=WTS.get('wts_members',WTS.seed);let h='';['tlp','edn'].forEach(k=>(d[k]||[]).forEach((m,i)=>h+=`<div class="admin-item"><div class="admin-thumb">${m.image?`<img src="${m.image}">`:'✦'}</div><div style="flex:1"><b>${k.toUpperCase()} • ${m.name}</b><small style="display:block;color:#888">${m.gen} · ${m.real||'—'} ${m.kami?'· '+m.kami:''}</small></div><button class="primary danger" style="margin:0;padding:8px 10px" onclick="delMember('${k}',${i})">ลบ</button></div>`));document.getElementById('adminMembers').innerHTML=h}function delMember(k,i){const d=WTS.get('wts_members',WTS.seed);d[k].splice(i,1);WTS.set('wts_members',d);renderAdmin()}function saveBg(){const c=document.getElementById('bgColor').value;const f=document.getElementById('bgFile').files[0];const save=v=>{localStorage.setItem('wts_bg',v||c);document.documentElement.style.setProperty('--wts-bg',v||c);alert('บันทึกพื้นหลังแล้ว')};if(f){const r=new FileReader();r.onload=()=>save('url(\"'+r.result+'\")');r.readAsDataURL(f)}else save(c)}function resetBg(){localStorage.removeItem('wts_bg');document.documentElement.style.removeProperty('--wts-bg');alert('รีเซ็ตพื้นหลังแล้ว')}function addMember(){const f=document.getElementById('mphoto').files[0],save=img=>{const d=WTS.get('wts_members',WTS.seed),k=document.getElementById('mgroup').value;d[k].push({gen:document.getElementById('mgen').value||'Generation 1',name:document.getElementById('mname').value||'New Member',real:document.getElementById('mreal').value||'—',age:document.getElementById('mage').value||'—',kami:document.getElementById('mkami').value||'',bio:document.getElementById('mbio').value||'',image:img||''});WTS.set('wts_members',d);alert('เพิ่มสมาชิกแล้ว');renderAdmin()};if(f){const r=new FileReader();r.onload=()=>save(r.result);r.readAsDataURL(f)}else save('')}</script></body></html>
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WAY TO SHINE • ADMIN</title><link rel="stylesheet" href="style.css">
+<style>
+.wts-admin{max-width:760px;margin:auto;padding:22px 18px 80px}.wts-box{background:#fff;border:1px solid #eee;border-radius:24px;padding:20px;margin:14px 0;box-shadow:0 10px 30px #00000009}
+.wts-box h2{margin-top:0}.wts-box input,.wts-box select,.wts-box textarea{width:100%;padding:13px;margin:5px 0 10px;border:1px solid #ddd;border-radius:13px;font:inherit}.wts-box button{padding:11px 15px;border:0;border-radius:12px;font-weight:800}.wts-primary{background:#8c68d9;color:#fff}.wts-row{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px dashed #eee;padding:12px 0}.wts-count{font-size:13px;color:#777}
+</style></head><body>
+<header class="top"><a class="back" href="index.html">‹</a><b>ADMIN PANEL</b><a class="icon" href="index.html">⌂</a></header>
+<main class="wts-admin">
+<div class="wts-box"><h1>WAY TO SHINE ADMIN</h1><p>หลังบ้านสำหรับเพิ่ม/แก้ข้อมูลสมาชิก</p><div class="wts-count">โครงจำนวนสมาชิกเริ่มต้น: TLP48 2 / 4 / 2 / 7 • EDN48 5 / 11 / 13</div></div>
+<div class="wts-box"><h2>เพิ่มโปรไฟล์สมาชิก</h2>
+<label>Group</label><select id="wts-group"><option>TLP48</option><option>EDN48</option></select>
+<label>Generation</label><select id="wts-gen"><option value="1">1st Generation</option><option value="2">2nd Generation</option><option value="3">3rd Generation</option><option value="4">4th Generation</option></select>
+<label>ชื่อสมาชิก</label><input id="wts-name" data-wts-input placeholder="Member Name">
+<label>ชื่อจริง</label><input id="wts-real" data-wts-input placeholder="Real Name">
+<label>อายุ</label><input id="wts-age" data-wts-input placeholder="Age">
+<label>Instagram</label><input id="wts-ig" data-wts-input placeholder="@instagram">
+<label>ข้อมูลเพิ่มเติม</label><textarea id="wts-info" data-wts-input placeholder="Profile information"></textarea>
+<label>รูปโปรไฟล์</label><input id="wts-image" data-wts-input placeholder="ใส่ชื่อไฟล์/ลิงก์รูป">
+<button class="wts-primary" onclick="wtsAddMember()">+ เพิ่มโปรไฟล์</button>
+</div>
+<div class="wts-box"><h2>สมาชิกที่เพิ่มจากหลังบ้าน</h2><div id="wts-admin-members">กำลังโหลด...</div></div>
+<div class="wts-box"><h2>โครงจำนวนสมาชิก</h2>
+<div class="wts-row"><b>TLP48 GEN 1</b><span>2 คน</span></div><div class="wts-row"><b>TLP48 GEN 2</b><span>4 คน</span></div>
+<div class="wts-row"><b>TLP48 GEN 3</b><span>2 คน</span></div><div class="wts-row"><b>TLP48 GEN 4</b><span>7 คน</span></div>
+<div class="wts-row"><b>EDN48 GEN 1</b><span>5 คน</span></div><div class="wts-row"><b>EDN48 GEN 2</b><span>11 คน</span></div><div class="wts-row"><b>EDN48 GEN 3</b><span>13 คน</span></div>
+</div>
+</main>
+
+<script>
+const WTS_DEFAULTS={
+ TLP48:[2,4,2,7],
+ EDN48:[5,11,13]
+};
+function wtsMembers(){
+ try{return JSON.parse(localStorage.getItem('wts_members')||'[]')}catch(e){return[]}
+}
+function wtsSaveMembers(a){localStorage.setItem('wts_members',JSON.stringify(a))}
+function wtsRenderAdmin(){
+ const el=document.getElementById('wts-admin-members'); if(!el)return;
+ const a=wtsMembers();
+ el.innerHTML=a.length?a.map((m,i)=>`<div class="wts-admin-row"><b>${m.group} GEN ${m.gen}</b> — ${m.name||'Member '+(i+1)} <button onclick="wtsDeleteMember(${i})">ลบ</button></div>`).join(''):'ยังไม่มีโปรไฟล์ที่เพิ่มจากหลังบ้าน';
+}
+function wtsAddMember(){
+ const group=document.getElementById('wts-group').value,gen=+document.getElementById('wts-gen').value;
+ const name=document.getElementById('wts-name').value.trim(),real=document.getElementById('wts-real').value.trim();
+ if(!name)return alert('กรุณาใส่ชื่อสมาชิก');
+ const a=wtsMembers();a.push({group,gen,name,real,age:document.getElementById('wts-age').value,ig:document.getElementById('wts-ig').value,info:document.getElementById('wts-info').value,image:document.getElementById('wts-image').value});
+ wtsSaveMembers(a);wtsRenderAdmin();document.querySelectorAll('[data-wts-input]').forEach(x=>x.value='');alert('เพิ่มโปรไฟล์แล้ว');
+}
+function wtsDeleteMember(i){const a=wtsMembers();a.splice(i,1);wtsSaveMembers(a);wtsRenderAdmin()}
+document.addEventListener('DOMContentLoaded',wtsRenderAdmin);
+</script>
+</body></html>
