@@ -1,42 +1,15 @@
 (function(){
-  const members = Array.from({length:12},(_,i)=>({id:'member-'+(i+1),name:'NAME',group:i%2?'TLP48':'EDN48'}));
-  const votes = JSON.parse(localStorage.getItem('wts_spark_votes_v1')||'{}');
-  const isLogged = localStorage.getItem('wts_logged')==='1';
-  const userStars = Number(localStorage.getItem('wts_star')||0);
-  const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  function fmt(n){return Number(n||0).toLocaleString('en-US')}
-  function rank(){return [...members].sort((a,b)=>(votes[b.id]||0)-(votes[a.id]||0));}
-  function sendStar(id){
-    if(!isLogged){
-      const back=location.pathname.split('/').pop()||'spark.html';
-      location.href='login.html?return='+encodeURIComponent(back); return;
-    }
-    const available=Number(localStorage.getItem('wts_star')||0);
-    if(available<1){alert('STAR ของคุณไม่พอ');return;}
-    let amount=prompt('ใส่จำนวน STAR ที่ต้องการส่ง\nSTAR คงเหลือ: '+fmt(available),'1');
-    if(amount===null)return;
-    amount=Math.floor(Number(amount));
-    if(!Number.isFinite(amount)||amount<1||amount>available){alert('จำนวน STAR ไม่ถูกต้อง');return;}
-    votes[id]=(votes[id]||0)+amount;
-    localStorage.setItem('wts_spark_votes_v1',JSON.stringify(votes));
-    localStorage.setItem('wts_star',available-amount);
-    render();
-  }
-  function card(m,compact=false){
-    const score=votes[m.id]||0;
-    return `<article class="spark-member ${compact?'compact':''}">
-      <div class="spark-avatar">?</div>
-      <div class="spark-member-info"><b>NAME</b><small>${m.group}</small><span>⭐ ${fmt(score)} STAR</span></div>
-      <button class="send-star" data-id="${m.id}">Send Star</button>
-    </article>`;
-  }
-  function render(){
-    const full=$('#spark-full-list'); if(full) full.innerHTML=rank().map((m,i)=>`<div class="spark-row"><div class="rank-no">${i+1}</div><div class="spark-avatar small">?</div><div class="spark-row-info"><b>NAME</b><small>${m.group}</small><span>⭐ ${fmt(votes[m.id]||0)} STAR</span></div><button class="send-star" data-id="${m.id}">Send Star</button></div>`).join('');
-    const preview=$('#spark-preview-members'); if(preview) preview.innerHTML=members.slice(0,7).map(m=>card(m,true)).join('');
-    const featured=$('#spark-featured'); if(featured){const top=rank()[0];featured.innerHTML=`<div class="featured-avatar">?</div><div class="featured-name">NAME</div><div class="featured-group">${top.group}</div><div class="featured-score">⭐ ${fmt(votes[top.id]||0)} STAR</div><button class="send-star featured-btn" data-id="${top.id}">Send Star</button>`;}
-    $$('.send-star').forEach(b=>b.onclick=()=>sendStar(b.dataset.id));
-    const balance=$('#spark-star-balance'); if(balance) balance.textContent=fmt(localStorage.getItem('wts_star')||0);
-  }
-  document.addEventListener('DOMContentLoaded',render);
-  window.WTSSpark={render,sendStar};
+ const esc=v=>WTSCloud.esc(v),fmt=n=>Number(n||0).toLocaleString('en-US');
+ async function render(){
+  const featured=document.getElementById('spark-featured'),list=document.getElementById('spark-full-list'),preview=document.getElementById('spark-preview-members');
+  if(!featured&&!list&&!preview)return;
+  try{const [members,scores,me]=await Promise.all([WTSCloud.members(),WTSCloud.sparkScores(),WTSCloud.session()]);const rows=members.map(m=>({...m,score:Number(scores[m.id]||0)})).sort((a,b)=>b.score-a.score);
+   const top=rows[0];
+   if(featured)featured.innerHTML=top?`<div class="spark-feature-card"><div class="spark-big-avatar" ${top.avatar_url?`style="background-image:url('${esc(top.avatar_url)}')"`:''}>${top.avatar_url?'':esc((top.display_name||'N')[0])}</div><div class="spark-big-name">${esc(top.display_name||'NAME')}</div><div class="spark-big-score">⭐ ${fmt(top.score)} STAR</div><button class="primary" onclick="sendSpark('${top.id}')">Send Star</button></div>`:'<div class="spark-feature-card"><div class="spark-big-avatar">?</div><div class="spark-big-name">NAME</div><div class="spark-big-score">0 STAR</div></div>';
+   if(preview)preview.innerHTML=rows.slice(0,8).map(m=>`<a class="spark-preview-card" href="account.html?member=${encodeURIComponent(m.username)}"><div class="spark-preview-avatar" ${m.avatar_url?`style="background-image:url('${esc(m.avatar_url)}')"`:''}>${m.avatar_url?'':esc((m.display_name||'N')[0])}</div><b>${esc(m.display_name||'NAME')}</b><small>${fmt(m.score)} STAR</small></a>`).join('');
+   if(list)list.innerHTML=rows.length?rows.map((m,i)=>`<article class="spark-row"><div class="spark-rank">${i+1}</div><div class="spark-avatar" ${m.avatar_url?`style="background-image:url('${esc(m.avatar_url)}')"`:''}>${m.avatar_url?'':esc((m.display_name||'N')[0])}</div><div class="spark-row-info"><b>${esc(m.display_name||'NAME')}</b><small>${esc(m.group_name)} · ${fmt(m.score)} STAR</small></div><button class="primary" onclick="sendSpark('${m.id}')">Send Star</button></article>`).join(''):'<div class="timeline-empty">ยังไม่มีสมาชิก</div>';
+  }catch(e){if(featured)featured.innerHTML='<div class="timeline-empty">เชื่อมต่อ Spark ไม่สำเร็จ</div>'}
+ }
+ window.sendSpark=async id=>{try{const me=await WTSCloud.session();if(!me){location.href='login.html?return=spark.html';return}if(me.role!=='fan'){alert('เฉพาะแฟนคลับเท่านั้น');return}const n=prompt('จำนวน STAR ที่ต้องการส่ง','1');if(n===null)return;await WTSCloud.sendMemberStar(id,Number(n));alert('ส่ง STAR สำเร็จ');render()}catch(e){alert(e.message)}};
+ document.addEventListener('DOMContentLoaded',render);window.WTSSpark={render};
 })();
