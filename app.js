@@ -1,44 +1,15 @@
 (function(){
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const body=document.body;
-  body.classList.add('wts-ready');
-  if(!reduce) requestAnimationFrame(()=>body.classList.add('wts-enter'));
-
-  // page transition: tap -> soft flash -> next page
-  document.querySelectorAll('a[href]').forEach(a=>{
-    const href=a.getAttribute('href');
-    if(!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:')) return;
-    a.addEventListener('click',function(e){
-      if(e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const url=new URL(href,location.href);
-      if(url.origin!==location.origin) return;
-      e.preventDefault();
-      if(reduce){location.href=href;return;}
-      document.body.classList.add('wts-leave');
-      const veil=document.createElement('div'); veil.className='wts-transition';
-      veil.innerHTML='<span>✦</span><small>WAY TO SHINE</small>';
-      document.body.appendChild(veil);
-      setTimeout(()=>location.href=href,260);
-    });
-  });
-
-  // tactile ripple for buttons/cards/menu items
-  document.querySelectorAll('a,.btn,button,.card,.club-card,.event').forEach(el=>{
-    el.addEventListener('pointerdown',function(e){
-      if(reduce) return;
-      const r=el.getBoundingClientRect();
-      const dot=document.createElement('i'); dot.className='wts-ripple';
-      dot.style.left=(e.clientX-r.left)+'px'; dot.style.top=(e.clientY-r.top)+'px';
-      el.appendChild(dot); setTimeout(()=>dot.remove(),500);
-    });
-  });
-
-  // gentle reveal as sections enter viewport
-  if(!reduce && 'IntersectionObserver' in window){
-    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('wts-show');io.unobserve(e.target)}}),{threshold:.08});
-    document.querySelectorAll('.section,.card,.club-card,.banner,.spark,.event,.menu-extra a,.quick a').forEach((el,i)=>{el.classList.add('wts-reveal');el.style.setProperty('--wts-delay',Math.min(i*35,280)+'ms');io.observe(el)});
-  }
-
-  // nicer refresh button feedback
-  document.querySelectorAll('.refresh').forEach(b=>b.addEventListener('click',()=>{b.classList.add('wts-spin');setTimeout(()=>b.classList.remove('wts-spin'),500)}));
+const seed={
+ tlp:[{gen:'Generation 1',name:'TLP Member 01',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''},{gen:'Generation 1',name:'TLP Member 02',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''},{gen:'Generation 2',name:'TLP Member 03',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''},{gen:'Generation 2',name:'TLP Member 04',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''},{gen:'Generation 3',name:'TLP Member 05',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''},{gen:'Generation 4',name:'TLP Member 06',real:'Real Name',age:'—',kami:'',bio:'TLP48 Member',image:''}],
+ edn:[{gen:'Generation 1',name:'EDN Member 01',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''},{gen:'Generation 1',name:'EDN Member 02',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''},{gen:'Generation 2',name:'EDN Member 03',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''},{gen:'Generation 2',name:'EDN Member 04',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''},{gen:'Generation 3',name:'EDN Member 05',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''},{gen:'Generation 4',name:'EDN Member 06',real:'Real Name',age:'—',kami:'',bio:'EDN48 Member',image:''}],
+ songs:{tlp:[{title:'TLP48 1st Single',cost:2,desc:'TLP48 Audio Version'},{title:'Tulips Shine',cost:2,desc:'TLP48 Audio Version'},{title:'Blue Flower',cost:3,desc:'TLP48 Audio Version'}],edn:[{title:'EDN48 1st Single',cost:2,desc:'EDN48 Audio Version'},{title:'Eden Shine',cost:2,desc:'EDN48 Audio Version'},{title:'Purple Star',cost:3,desc:'EDN48 Audio Version'}]}
+};
+function get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v===null?d:v}catch(e){return d}}
+function set(k,v){localStorage.setItem(k,JSON.stringify(v))}
+if(!localStorage.getItem('wts_members'))set('wts_members',seed);
+if(!localStorage.getItem('wts_songs'))set('wts_songs',seed.songs);
+if(localStorage.getItem('wts_token')===null)localStorage.setItem('wts_token','10');
+if(localStorage.getItem('wts_stars')===null)localStorage.setItem('wts_stars','100');
+if(localStorage.getItem('wts_major')===null)localStorage.setItem('wts_major','5');
+const bg=localStorage.getItem('wts_bg'); if(bg) document.documentElement.style.setProperty('--wts-bg',bg); window.WTS={get,set,seed};
 })();
