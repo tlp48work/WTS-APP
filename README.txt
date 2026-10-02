@@ -1,12 +1,19 @@
-WAY TO SHINE ANIMATED UPDATED
-ยึดโครง Animated เดิม + Member Profile แยก Generation + Banner สมาชิกหมุนอัตโนมัติ + Music Audio Token Unlock + Login/Register + My Account + Admin Panel
-สมาชิกและเพลงเว้นว่างไว้ให้แอดมินเพิ่มเอง
-Admin เพิ่มสมาชิกได้พร้อม Photo URL, เพิ่มเพลงพร้อม Cover URL และ Audio URL และตั้งพื้นหลังได้
-หมายเหตุ: Admin Panel รุ่น static นี้เก็บข้อมูลใน localStorage ของเบราว์เซอร์เครื่องนั้น หากต้องการให้แอดมินแก้แล้วผู้ใช้ทุกคนเห็นพร้อมกัน ต้องเชื่อมฐานข้อมูลและระบบ authentication จริง
+WAY TO SHINE • ANIMATED SPARK PUBLIC
 
+ปรับโครงสร้างใหม่จากโปรเจกต์เดิม: TLP48 = ฟ้าขาว / TULIPS ZONE และ EDN48 = ม่วงขาว / EDEN CLUB
 
-SPARK OF THE MONTH
-- Spark page and home-page preview are interactive.
-- Members initially display as NAME with 0 STAR.
-- Send Star requires login and uses the user's STAR balance.
-- Data is stored in browser localStorage for this static Vercel build. It is public/deployable, but votes are not shared between different devices until a real database/backend is connected.
+ระบบหน้าเว็บ:
+- Animated hero banners และ member banner หมุนอัตโนมัติ
+- Member directory แยกรุ่น พร้อมโปรไฟล์
+- Music Audio ปลดล็อกด้วย TOKEN และเล่นไฟล์เสียง
+- SPARK OF THE MONTH ใช้ STAR
+- Major Vote ใช้ TOKEN และ Admin pause/open/end ได้
+- Fan / Member Login หน้าเดียวกัน และ My Account เปลี่ยนตาม role
+- Fan Account: Oshi List, STAR, TOKEN, Inventory, แก้โปรไฟล์
+- Member Account: โปรไฟล์ + Timeline ไม่มี Kami-Oshi/ตัวเลขสะสม
+- Timeline สำหรับสมาชิกโพสต์ได้
+- TULIPS ZONE / EDEN CLUB: Redeem Code, Buy STAR, Shop & Merchandise, Inventory
+- Admin CMS: logo, currency, banners สูงสุด 10 ต่อวง, members, member logins, music, events, merchandise, redeem codes, schedule สูงสุด 5 ต่อวง, export/import
+
+หมายเหตุสำคัญ:
+เวอร์ชันนี้เป็น static/localStorage prototype ที่พร้อมเอา UI ไปวางบน Vercel และทดสอบ flow ได้ทันที แต่ข้อมูลยังไม่ใช่ฐานข้อมูลสาธารณะจริงข้ามอุปกรณ์ และ password ยังเป็น client-side demo. สำหรับ production จริงควรต่อ Auth + Database + Storage + server-side transaction/OAuth (เช่น Supabase/Firebase) ก่อนเปิดใช้งานจริง.

@@ -1,13 +1,5 @@
-
-document.addEventListener("DOMContentLoaded",()=>{
-  document.querySelectorAll(".hero-slider").forEach(slider=>{
-    const slides=[...slider.querySelectorAll(".hero-slide")];
-    if(!slides.length)return;
-    let i=0;
-    slides.forEach((s,n)=>s.classList.toggle("active",n===0));
-    setInterval(()=>{slides[i].classList.remove("active");i=(i+1)%slides.length;slides[i].classList.add("active")},5000);
-  });
-  document.querySelectorAll("[data-scroll]").forEach(b=>b.addEventListener("click",()=>{
-    document.getElementById(b.dataset.scroll)?.scrollIntoView({behavior:"smooth"})
-  }));
-});
+(()=>{const {K,read,write,esc,fmt,session}=WTS;function banners(group){const root=document.querySelector('.dynamic-banners');if(!root)return;let a=read(K.banners,{})[group]||[];if(!a.length)a=[{title:`SHINE WITH ${group}`,subtitle:'พื้นที่อัปเดตงานใหม่ ๆ และเรื่องราวของสมาชิก',label:`${group} • FEATURE`,image:''},{title:'SEE YOU SOON',subtitle:'เช็กตารางงานและกิจกรรมที่จะมาถึง',label:`${group} • SCHEDULE`,image:''},{title:'SPARK OF THE MONTH',subtitle:'EDN48 × TLP48 • ส่ง STAR ให้คนที่คุณรัก',label:'SPECIAL EVENT',image:''}];root.innerHTML=a.slice(0,10).map((x,i)=>`<article class="slide ${i?'':'active'}" style="${x.image?`background-image:linear-gradient(100deg,rgba(20,20,35,.72),rgba(20,20,35,.1)),url('${x.image}')`:''}"><div class="slide-shimmer"></div><span class="eyebrow">${esc(x.label||group)}</span><h1>${esc(x.title||'SHINE')}</h1><p>${esc(x.subtitle||'')}</p>${x.cta?`<a class="btn" href="${esc(x.link||'#')}">${esc(x.cta)}</a>`:''}</article>`).join('')+`<div class="slider-dots">${a.slice(0,10).map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`;let i=0;const slides=[...root.querySelectorAll('.slide')],dots=[...root.querySelectorAll('.slider-dots i')];setInterval(()=>{slides[i].classList.remove('active');dots[i]?.classList.remove('on');i=(i+1)%slides.length;slides[i].classList.add('active');dots[i]?.classList.add('on')},5000)}
+function schedule(group){const r=document.querySelector('#schedule');if(!r)return;const d=read(K.schedule,{})[group]||[];r.innerHTML=d.slice(0,5).map(x=>`<div class="event"><div class="event-date"><b>${esc(x.date||'—')}</b><small>${esc(x.time||'')}</small></div><div><strong>${esc(x.title||'Untitled Event')}</strong><small>${esc(x.place||group)}</small></div><span>›</span></div>`).join('')||`<div class="empty-card">ยังไม่มีตารางงาน <small>แอดมินสามารถเพิ่มได้สูงสุด 5 งาน</small></div>`}
+function works(group){const r=document.querySelector('#works');if(!r)return;const d=read(K.works,{})[group]||[];r.innerHTML=d.slice(0,4).map(x=>`<article class="work-card" style="${x.image?`background-image:linear-gradient(180deg,transparent 25%,rgba(0,0,0,.78)),url('${x.image}')`:''}"><div><small>${esc(x.type||'WORK')}</small><b>${esc(x.title||'Latest Work')}</b><span>${esc(x.date||'')}</span></div></article>`).join('')||`<div class="empty-card">ผลงานล่าสุดของ ${group} จะแสดงตรงนี้</div>`}
+function events(group){const r=document.querySelector('#eventsBanner');if(!r)return;const d=(read(K.events,[])||[]).filter(x=>!x.group||x.group===group);r.innerHTML=d.slice(0,2).map(x=>`<a class="event-banner" href="major-vote.html" style="${x.image?`background-image:linear-gradient(100deg,rgba(30,20,45,.6),rgba(30,20,45,.05)),url('${x.image}')`:''}"><small>MAJOR VOTE</small><b>${esc(x.title)}</b><span>${esc(x.start||'')} → ${esc(x.end||'')}</span></a>`).join('')||`<div class="event-banner placeholder"><small>${group} EVENT</small><b>More shining moments are coming.</b><span>ประกาศงานใหม่จาก Admin</span></div>`}
+banners(document.querySelector('.app')?.classList.contains('tlp')?'TLP48':'EDN48');const g=document.querySelector('.app')?.classList.contains('tlp')?'TLP48':'EDN48';schedule(g);works(g);events(g);})();
