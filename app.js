@@ -1,23 +1,29 @@
-(()=>{
-const K={settings:'wts_settings_v2',members:'wts_members_v2',accounts:'wts_accounts_v2',fan:'wts_fans_v2',session:'wts_session_v2',songs:'wts_songs_v2',schedule:'wts_schedule_v2',banners:'wts_banners_v2',works:'wts_works_v2',events:'wts_major_events_v2',merch:'wts_merch_v2',inventory:'wts_inventory_v2',redeem:'wts_redeem_v2',spark:'wts_spark_v2',timeline:'wts_timeline_v2'};
-const defaults={settings:{appName:'WAY TO SHINE',logo:'✦',tokenName:'TOKEN',tokenIcon:'🪙',starName:'STAR',starIcon:'⭐',background:'linear-gradient(180deg,#fff 0%,#fbf9ff 100%)',currencies:[]},members:{TLP48:[],EDN48:[]},accounts:[],fan:[],songs:{TLP48:[],EDN48:[]},schedule:{TLP48:[],EDN48:[]},banners:{TLP48:[],EDN48:[]},works:{TLP48:[],EDN48:[]},events:[],merch:[],inventory:[],redeem:[],spark:{votes:{},members:[]},timeline:[]};
-function read(k,d){try{return JSON.parse(localStorage.getItem(k)??JSON.stringify(d))}catch{return d}}
-function write(k,v){localStorage.setItem(k,JSON.stringify(v));return v}
-function settings(){return {...defaults.settings,...read(K.settings,defaults.settings)}}
-function seed(){if(!localStorage.getItem(K.settings))write(K.settings,defaults.settings);if(!localStorage.getItem(K.members))write(K.members,defaults.members);if(!localStorage.getItem(K.accounts))write(K.accounts,defaults.accounts);if(!localStorage.getItem(K.fan))write(K.fan,defaults.fan);if(!localStorage.getItem(K.songs))write(K.songs,defaults.songs);if(!localStorage.getItem(K.schedule))write(K.schedule,defaults.schedule);if(!localStorage.getItem(K.banners))write(K.banners,defaults.banners);if(!localStorage.getItem(K.works))write(K.works,defaults.works);if(!localStorage.getItem(K.events))write(K.events,defaults.events);if(!localStorage.getItem(K.merch))write(K.merch,defaults.merch);if(!localStorage.getItem(K.inventory))write(K.inventory,defaults.inventory);if(!localStorage.getItem(K.redeem))write(K.redeem,defaults.redeem);if(!localStorage.getItem(K.spark))write(K.spark,defaults.spark);if(!localStorage.getItem(K.timeline))write(K.timeline,defaults.timeline);migrateAccounts()}
-function norm(v){return String(v??'').trim().toLowerCase()}
-function migrateAccounts(){let a=read(K.accounts,[]),f=read(K.fan,[]),changed=false;a=a.map(x=>{const y={...x};if(!y.id){y.id='member_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);changed=true}if(y.type!=='member'){y.type='member';changed=true}if(y.username!==String(y.username||'').trim()){y.username=String(y.username||'').trim();changed=true}if(y.profile==null){y.profile={};changed=true}return y});f=f.map(x=>{const y={...x};if(!y.id){y.id='fan_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);changed=true}if(y.type!=='fan'){y.type='fan';changed=true}if(y.username!==String(y.username||'').trim()){y.username=String(y.username||'').trim();changed=true}if(y.email!==String(y.email||'').trim()){y.email=String(y.email||'').trim();changed=true}if(y.profile==null){y.profile={};changed=true}return y});if(changed){write(K.accounts,a);write(K.fan,f)}}
-function findLogin(username,password){const u=norm(username),p=String(password??'');const a=read(K.accounts,[]).find(x=>norm(x.username)===u&&String(x.password??'')===p);if(a)return a;return read(K.fan,[]).find(x=>(norm(x.username)===u||norm(x.email)===u)&&String(x.password??'')===p)||null}
-function session(){const s=read(K.session,null);if(!s)return null;let arr=s.type==='member'?read(K.accounts,[]):read(K.fan,[]);let found=arr.find(x=>s.id&&x.id===s.id)||arr.find(x=>norm(x.username)===norm(s.username));if(found)return found;const fallback=[...read(K.accounts,[]),...read(K.fan,[])];return fallback.find(x=>s.id&&x.id===s.id)||fallback.find(x=>norm(x.username)===norm(s.username))||null}
-function login(account){const type=account.type==='member'?'member':'fan';write(K.session,{id:account.id||null,type,username:account.username});if(type==='fan'&&!Number.isFinite(Number(account.star)))account.star=0;return account}
-function logout(){localStorage.removeItem(K.session);location.href='index.html'}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function fmt(v){return Number(v||0).toLocaleString('en-US')}
-function fileData(file){return new Promise((res,rej)=>{if(!file)return res('');const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
-function groupTheme(g){return g==='TLP48'?'tlp':'edn'}
-function getBalance(type='token'){const s=session();if(!s)return 0;if(s.type==='member')return Number(s.token||0);return Number(s[type]||0)}
-function changeBalance(type,delta){const s=session();if(!s)return false;const key=type==='star'?'star':type;let arr=s.type==='member'?read(K.accounts,[]):read(K.fan,[]);const i=arr.findIndex(x=>x.username===s.username);if(i<0)return false;arr[i][key]=Math.max(0,Number(arr[i][key]||0)+Number(delta));write(s.type==='member'?K.accounts:K.fan,arr);return true}
-function ensureDemo(){seed();}
-function applyTheme(root=document.body){const s=settings();document.documentElement.style.setProperty('--app-bg',s.background||defaults.settings.background);document.documentElement.style.setProperty('--app-name',JSON.stringify(s.appName));document.querySelectorAll('[data-app-logo]').forEach(x=>x.textContent=s.logo||'✦');document.querySelectorAll('[data-app-name]').forEach(x=>x.textContent=s.appName||'WAY TO SHINE')}
-window.WTS={K,defaults,read,write,settings,seed,session,login,logout,findLogin,esc,fmt,fileData,groupTheme,getBalance,changeBalance,applyTheme};ensureDemo();document.addEventListener('DOMContentLoaded',()=>applyTheme());
-})();
+/* WAY TO SHINE • shared client system
+   Static/Public-ready frontend. For multi-device persistence, connect the same data model to a backend later. */
+const WTS={
+  accounts:'wts_accounts_v2', posts:'wts_timeline_v2', settings:'wts_settings_v2',
+  events:'wts_events_v2', merch:'wts_merch_v2', schedule:'wts_schedule_v2',
+  votes:'wts_major_votes_v2', spark:'wts_spark_v2'
+};
+const $=id=>document.getElementById(id);
+const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function current(){const u=localStorage.getItem('wts_current_user');return u?read(WTS.accounts,{users:[]}).users.find(x=>x.username===u)||null:null}
+function settings(){return read(WTS.settings,{appName:'WAY TO SHINE',logo:'',starLogo:'⭐',tokenLogo:'🪙',banners:[]})}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function fmt(n){return Number(n||0).toLocaleString('en-US')}
+function requireLogin(){if(!current()){location.href='login.html?return='+encodeURIComponent(location.pathname+location.search);return false}return true}
+function logout(){localStorage.removeItem('wts_current_user');location.href='index.html'}
+function login(username,password){const d=read(WTS.accounts,{users:[]});const u=d.users.find(x=>x.username===username&&x.password===password);if(!u)return false;localStorage.setItem('wts_current_user',u.username);return true}
+function saveUser(user){const d=read(WTS.accounts,{users:[]});const i=d.users.findIndex(x=>x.username===user.username);if(i>=0)d.users[i]=user;else d.users.push(user);save(WTS.accounts,d)}
+function defaultUser(fields){return Object.assign({id:uid(),role:'fan',group:'',name:'NAME',username:'',password:'',avatar:'',cover:'',stars:0,token:0,major:0,oshiList:[],kamiOshi:'',inventory:[]},fields)}
+function applyBrand(){const s=settings();document.querySelectorAll('[data-app-name]').forEach(x=>x.textContent=s.appName||'WAY TO SHINE');document.querySelectorAll('[data-logo]').forEach(x=>x.innerHTML=s.logo?`<img src="${s.logo}" alt="">`:'✦');document.querySelectorAll('[data-star-logo]').forEach(x=>x.innerHTML=s.starLogo||'⭐');document.querySelectorAll('[data-token-logo]').forEach(x=>x.innerHTML=s.tokenLogo||'🪙');if(s.banners?.length){document.querySelectorAll('[data-admin-banner]').forEach((x,i)=>{x.style.backgroundImage=`url(${s.banners[i%s.banners.length]})`;x.classList.add('has-image')})}}
+function addPost(text,image='',video='',group=''){const u=current();if(!u||u.role!=='member')return false;const p=read(WTS.posts,[]);p.unshift({id:uid(),author:u.username,name:u.name,group:u.group||group,avatar:u.avatar||'',text,image,video,stars:0,comments:0,createdAt:new Date().toISOString()});save(WTS.posts,p);return true}
+function postsFor(group){return read(WTS.posts,[]).filter(p=>!group||p.group===group)}
+function sendStarToMember(username,amount){const fan=current();if(!fan||fan.role!=='fan')return {ok:false,msg:'เฉพาะแฟนคลับเท่านั้น'};amount=Number(amount);if(!Number.isFinite(amount)||amount<1)return {ok:false,msg:'จำนวน STAR ไม่ถูกต้อง'};if(fan.stars<amount)return {ok:false,msg:'STAR ไม่พอ'};const d=read(WTS.accounts,{users:[]});const member=d.users.find(x=>x.username===username&&x.role==='member');if(!member)return {ok:false,msg:'ไม่พบสมาชิก'};fan.stars-=amount;member.stars=Number(member.stars||0)+amount;d.users=d.users.map(x=>x.username===fan.username?fan:x.username===member.username?member:x);save(WTS.accounts,d);return {ok:true}}
+function buyStar(amount){const u=current();amount=Number(amount);const cost=amount; if(!u||u.role!=='fan')return {ok:false,msg:'เฉพาะแฟนคลับ'};if(u.token<cost)return {ok:false,msg:'TOKEN ไม่พอ'};u.token-=cost;u.stars+=amount;saveUser(u);return {ok:true}}
+function applyAccountState(){const u=current();document.querySelectorAll('[data-user-name]').forEach(x=>x.textContent=u?.name||'GUEST');document.querySelectorAll('[data-user-avatar]').forEach(x=>{x.innerHTML=u?.avatar?`<img src="${u.avatar}" alt="">`:'○'});document.querySelectorAll('[data-user-stars]').forEach(x=>x.textContent=fmt(u?.stars));document.querySelectorAll('[data-user-token]').forEach(x=>x.textContent=fmt(u?.token));}
+function memberNameWithBadge(m){return `${escapeHtml(m.name)}${m.kamiOshi==='__SELF__'?' <span class="kami-badge">KAMI-OSHI</span>':''}`}
+window.WTS={read,save,uid,current,settings,escapeHtml,fmt,requireLogin,logout,login,saveUser,defaultUser,applyBrand,addPost,postsFor,sendStarToMember,buyStar,applyAccountState,memberNameWithBadge};
+document.addEventListener('DOMContentLoaded',()=>{applyBrand();applyAccountState()});
