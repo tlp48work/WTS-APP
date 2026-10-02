@@ -1,13 +1,12 @@
-WAY TO SHINE • PUBLIC BUILD
+WAY TO SHINE ANIMATED UPDATED
+ยึดโครง Animated เดิม + Member Profile แยก Generation + Banner สมาชิกหมุนอัตโนมัติ + Music Audio Token Unlock + Login/Register + My Account + Admin Panel
+สมาชิกและเพลงเว้นว่างไว้ให้แอดมินเพิ่มเอง
+Admin เพิ่มสมาชิกได้พร้อม Photo URL, เพิ่มเพลงพร้อม Cover URL และ Audio URL และตั้งพื้นหลังได้
+หมายเหตุ: Admin Panel รุ่น static นี้เก็บข้อมูลใน localStorage ของเบราว์เซอร์เครื่องนั้น หากต้องการให้แอดมินแก้แล้วผู้ใช้ทุกคนเห็นพร้อมกัน ต้องเชื่อมฐานข้อมูลและระบบ authentication จริง
 
-โครงสร้างเดิมของ WAY TO SHINE Animated ถูกคงไว้ และเพิ่ม Social Timeline, Member Account, Fan Account, Admin CMS, Spark, Shop, Merchandise, Star Shop, Major Vote, Music file picker และ Schedule
 
-ADMIN CODE: WTS-ADMIN-2026
-
-สมาชิก: Admin สร้าง username/password ให้จาก ADMIN > MEMBERS
-แฟนคลับ: สมัครเองที่ REGISTER
-
-หมายเหตุระบบข้อมูล:
-รุ่นนี้ทำงานได้ทันทีบน Vercel ในโหมด browser storage (localStorage) สำหรับการทดลอง/ต้นแบบ public UI ข้อมูลของแต่ละอุปกรณ์ยังไม่แชร์ข้ามเครื่อง
-หากจะใช้เป็นระบบสาธารณะจริงที่ผู้ใช้ทุกคนเห็นข้อมูลเดียวกัน ต้องต่อฐานข้อมูล + authentication + file storage (เช่น Supabase/Firebase) ก่อนเปิดระบบโหวต/เงิน/บัญชีจริง
-ไฟล์เลือกเพลง/รูปใช้ file picker ของเครื่อง ซึ่งบน Android สามารถเลือกไฟล์จาก Google Drive ได้ถ้า Drive แสดงเป็นแหล่งไฟล์ของเครื่อง
+SPARK OF THE MONTH
+- Spark page and home-page preview are interactive.
+- Members initially display as NAME with 0 STAR.
+- Send Star requires login and uses the user's STAR balance.
+- Data is stored in browser localStorage for this static Vercel build. It is public/deployable, but votes are not shared between different devices until a real database/backend is connected.
